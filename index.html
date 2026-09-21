@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sales Book</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#16233B">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sales Book">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{
+  --ink:#16233B; --ink2:#2A3D66; --paper:#F4F5F7; --card:#FFFFFF; --line:#DDE1E8;
+  --sun:#F4B41A; --sun-ink:#3A2A00; --leaf:#0E8F63; --brick:#C8452F; --muted:#667085; --text:#1B2433;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--text);font-family:"Avenir Next","Segoe UI",system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.4}
+#app{max-width:520px;margin:0 auto;min-height:100vh;padding:0 16px 100px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:18px 0 12px}
+.top h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.01em}
+.top select{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 8px}
+h2{font-size:17px;margin:22px 0 10px;font-weight:700}
+.hero{background:var(--ink);color:#fff;border-radius:18px;padding:20px 18px 16px}
+.hero .label{color:#B9C4DA;font-size:14px}
+.hero .big{font-size:44px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1;margin:2px 0 14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stats div{background:var(--ink2);border-radius:10px;padding:10px}
+.stats .v{font-weight:700;font-variant-numeric:tabular-nums;font-size:15px;overflow-wrap:anywhere}
+.stats .l{color:#B9C4DA;font-size:12.5px}
+.pos{color:#5FE0A9}.neg{color:#FF9C85}
+.bars{display:flex;align-items:flex-end;gap:8px;height:84px;margin-top:16px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px}
+.bar i{display:block;width:100%;background:#4A5F8D;border-radius:5px 5px 2px 2px;min-height:3px}
+.bar.today i{background:var(--sun)}
+.bar span{font-size:11.5px;color:#B9C4DA}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .name{font-weight:600}
+.row .sub{color:var(--muted);font-size:13.5px}
+.amt{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.amt.exp{color:var(--brick)}
+.badge{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:#E8ECF3;color:var(--ink2);margin-left:6px}
+.badge.credit{background:#FBE3DD;color:var(--brick)}
+.badge.momo{background:#DDF3EA;color:var(--leaf)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font-weight:600}
+.chip small{color:var(--muted);font-weight:500;margin-left:4px}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.on small{color:#B9C4DA}
+label{display:block;font-weight:600;font-size:14.5px;margin:14px 0 6px}
+input,select.f{width:100%;border:1px solid #C3CAD6;background:#fff;border-radius:10px;padding:12px;font-size:16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{border:1px solid #C3CAD6;background:#fff;border-radius:10px;padding:11px 4px;font-weight:600;font-size:14.5px}
+.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 12px;font-weight:600}
+.total b{font-size:26px;font-variant-numeric:tabular-nums}
+.btn{width:100%;border:0;border-radius:12px;padding:15px;font-weight:800;font-size:17px;background:var(--sun);color:var(--sun-ink)}
+.btn.ghost{background:transparent;border:1px solid #C3CAD6;color:var(--text);font-weight:600;font-size:15px;margin-top:10px}
+.small-btn{border:1px solid #C3CAD6;background:#fff;border-radius:8px;padding:6px 10px;font-size:14px;font-weight:600}
+.small-btn.go{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.x{border:0;background:transparent;color:var(--muted);font-size:20px;padding:0 6px;line-height:1}
+.err{color:var(--brick);font-size:14.5px;margin:10px 0 0}
+.empty{color:var(--muted);padding:6px 0}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
+.who{margin-top:14px}
+.who .head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.who .head b{font-size:17px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav div{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{border:0;background:transparent;padding:14px 4px;font-weight:600;color:var(--muted);position:relative}
+nav button.on{color:var(--ink);box-shadow:inset 0 3px 0 var(--sun)}
+nav .n{background:var(--brick);color:#fff;border-radius:99px;font-size:11.5px;padding:0 6px;margin-left:4px}
+.toast{position:fixed;left:50%;bottom:78px;transform:translate(-50%,10px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;font-weight:600;max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ---------- state ----------
+let state = { currency: 'GH₵', products: [], sales: [], expenses: [] };
+let ui = { tab: 'home', kind: 'sales', range: 'today', err: '',
+  form: { item: '', qty: 1, price: '', pay: 'cash', customer: '' },
+  exp: { note: '', amount: '' }, toast: '' };
+
+const $ = (s, el = document) => el.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 9);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => state.currency + ' ' + Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 });
+const lineTotal = s => s.qty * s.price;
+const dayStart = t => { const d = new Date(t); d.setHours(0,0,0,0); return d.getTime(); };
+const PAY = { cash: 'Cash', momo: 'Mobile money', credit: 'On credit' };
+const sum = (arr, f) => arr.reduce((a, x) => a + f(x), 0);
+
+function fmtTime(ts) {
+  const d = new Date(ts);
+  if (dayStart(ts) === dayStart(Date.now()))
+    return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  return d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+// ---------- storage: saved on this phone (localStorage) ----------
+const KEY = 'sales-book-v1';
+async function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) return void Object.assign(state, JSON.parse(raw));
+  } catch (e) {}
+  try { // fallback for Claude's preview, where localStorage is blocked
+    const r = await window.storage.get(KEY);
+    if (r && r.value) Object.assign(state, JSON.parse(r.value));
+  } catch (e) { /* no saved data yet */ }
+}
+async function save() {
+  const data = JSON.stringify(state);
+  try { localStorage.setItem(KEY, data); return; } catch (e) {}
+  try { await window.storage.set(KEY, data, false); } catch (e) {}
+}
+function toast(msg) {
+  ui.toast = msg;
+  const el = $('.toast');
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => { const e = $('.toast'); if (e) e.classList.remove('show'); }, 1800);
+}
+
+// ---------- views ----------
+function homeView() {
+  const t0 = dayStart(Date.now());
+  const today = state.sales.filter(s => s.ts >= t0);
+  const sales = sum(today, lineTotal);
+  const exp = sum(state.expenses.filter(e => e.ts >= t0), e => e.amount);
+  const profit = sales - exp;
+  const owed = sum(state.sales.filter(s => !s.paid), lineTotal);
+
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(t0); d.setDate(d.getDate() - i);
+    const start = d.getTime();
+    days.push({ start, label: d.toLocaleDateString([], { weekday: 'short' }).slice(0, 3),
+      v: sum(state.sales.filter(s => dayStart(s.ts) === start), lineTotal), today: i === 0 });
+  }
+  const max = Math.max(1, ...days.map(d => d.v));
+  const bars = days.map(d =>
+    `<div class="bar ${d.today ? 'today' : ''}" title="${esc(money(d.v))}"><i style="height:${Math.max(4, d.v / max * 100)}%"></i><span>${d.label}</span></div>`).join('');
+
+  const byItem = {};
+  today.forEach(s => { byItem[s.item] = (byItem[s.item] || 0) + lineTotal(s); });
+  const top = Object.entries(byItem).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+  const brandNew = !state.sales.length && !state.expenses.length;
+  return `
+    <section class="hero">
+      <div class="label">Sales today</div>
+      <div class="big">${money(sales)}</div>
+      <div class="stats">
+        <div><div class="v">${money(exp)}</div><div class="l">Spent</div></div>
+        <div><div class="v ${profit >= 0 ? 'pos' : 'neg'}">${money(profit)}</div><div class="l">Profit</div></div>
+        <div><div class="v">${money(owed)}</div><div class="l">Owed to you</div></div>
+      </div>
+      <div class="bars" aria-label="Sales over the last 7 days">${bars}</div>
+    </section>
+    ${brandNew ? `
+      <div class="card" style="margin-top:16px">
+        <b>Record your first sale</b>
+        <p class="sub" style="color:var(--muted);margin:6px 0 12px">Your totals, profit and debts will show up here.</p>
+        <button class="btn" data-action="tab" data-tab="sell">Record a sale</button>
+        <button class="btn ghost" data-action="sample">Fill with sample data</button>
+      </div>` : ''}
+    <h2>Best sellers today</h2>
+    <div class="card">
+      ${top.length ? top.map(([n, v]) => `<div class="row"><span class="name">${esc(n)}</span><span class="amt">${money(v)}</span></div>`).join('')
+        : '<div class="empty">No sales yet today.</div>'}
+    </div>`;
+}
+
+function sellView() {
+  const f = ui.form;
+  const chips = state.products.map(p =>
+    `<button class="chip ${f.item.toLowerCase() === p.name.toLowerCase() ? 'on' : ''}" data-action="chip" data-id="${p.id}">${esc(p.name)}<small>${money(p.price)}</small></button>`).join('');
+  return `
+    <h2 style="margin-top:6px">Record a sale</h2>
+    ${state.products.length ? `<div class="chips">${chips}</div>` : '<p class="empty">Items you sell will appear here as quick buttons.</p>'}
+    <label for="item">Item</label>
+    <input id="item" data-field="item" value="${esc(f.item)}" placeholder="e.g. Bread loaf" autocomplete="off">
+    <div class="two">
+      <div><label for="qty">Quantity</label><input id="qty" data-field="qty" type="number" inputmode="decimal" min="0" step="any" value="${esc(f.qty)}"></div>
+      <div><label for="price">Price each</label><input id="price" data-field="price" type="number" inputmode="decimal" min="0" step="any" value="${esc(f.price)}" placeholder="0"></div>
+    </div>
+    <label>How did they pay?</label>
+    <div class="seg">${Object.entries(PAY).map(([k, v]) => `<button class="${f.pay === k ? 'on' : ''}" data-action="pay" data-pay="${k}">${v}</button>`).join('')}</div>
+    <label for="customer">Customer name${f.pay === 'credit' ? '' : ' (optional)'}</label>
+    <input id="customer" data-field="customer" value="${esc(f.customer)}" placeholder="${f.pay === 'credit' ? 'Who owes you?' : 'Optional'}" autocomplete="off">
+    <div class="total"><span>Total</span><b id="liveTotal">${money((Number(f.qty) || 0) * (Number(f.price) || 0))}</b></div>
+    <button class="btn" data-action="submitSale">Record sale</button>
+    ${ui.err ? `<div class="err" role="alert">${esc(ui.err)}</div>` : ''}`;
+}
+
+function owedView() {
+  const open = state.sales.filter(s => !s.paid);
+  const groups = {};
+  open.forEach(s => { (groups[s.customer || 'No name'] = groups[s.customer || 'No name'] || []).push(s); });
+  const names = Object.keys(groups).sort((a, b) => sum(groups[b], lineTotal) - sum(groups[a], lineTotal));
+  return `
+    <h2 style="margin-top:6px">Owed to you: ${money(sum(open, lineTotal))}</h2>
+    ${names.length ? names.map(n => `
+      <div class="card who">
+        <div class="head"><b>${esc(n)}</b><span class="amt">${money(sum(groups[n], lineTotal))}</span></div>
+        ${groups[n].sort((a, b) => a.ts - b.ts).map(s => `
+          <div class="row"><div><div class="name">${esc(s.item)} × ${s.qty}</div><div class="sub">${fmtTime(s.ts)} · ${money(lineTotal(s))}</div></div>
+          <button class="small-btn go" data-action="paid" data-id="${s.id}">Mark paid</button></div>`).join('')}
+        ${groups[n].length > 1 ? `<button class="btn ghost" data-action="paidAll" data-name="${esc(n)}">Mark all paid</button>` : ''}
+      </div>`).join('')
+      : '<div class="card empty">Nobody owes you anything. Sales marked "On credit" show up here.</div>'}`;
+}
+
+function recordsView() {
+  const t0 = dayStart(Date.now());
+  const from = ui.range === 'today' ? t0 : ui.range === 'week' ? t0 - 6 * 86400000 : 0;
+  const isSales = ui.kind === 'sales';
+  const list = (isSales ? state.sales : state.expenses).filter(x => x.ts >= from).sort((a, b) => b.ts - a.ts);
+  const totalAmt = sum(list, isSales ? lineTotal : e => e.amount);
+  const chip = (act, key, cur, label) => `<button class="chip ${cur === key ? 'on' : ''}" data-action="${act}" data-v="${key}">${label}</button>`;
+  return `
+    <h2 style="margin-top:6px">Records</h2>
+    <div class="filters">${chip('kind', 'sales', ui.kind, 'Sales')}${chip('kind', 'expenses', ui.kind, 'Expenses')}</div>
+    <div class="filters">${chip('range', 'today', ui.range, 'Today')}${chip('range', 'week', ui.range, 'Last 7 days')}${chip('range', 'all', ui.range, 'All')}</div>
+    ${isSales ? '' : `
+      <div class="card" style="margin:12px 0">
+        <div class="two">
+          <div><label for="expNote" style="margin-top:0">What for?</label><input id="expNote" data-field="expNote" value="${esc(ui.exp.note)}" placeholder="e.g. Transport"></div>
+          <div><label for="expAmt" style="margin-top:0">Amount</label><input id="expAmt" data-field="expAmt" type="number" inputmode="decimal" min="0" step="any" value="${esc(ui.exp.amount)}" placeholder="0"></div>
+        </div>
+        <button class="btn" style="margin-top:12px" data-action="addExpense">Add expense</button>
+        ${ui.err ? `<div class="err" role="alert">${esc(ui.err)}</div>` : ''}
+      </div>`}
+    <div class="sub" style="color:var(--muted);margin:10px 0 6px">${list.length} ${isSales ? 'sales' : 'expenses'} · ${money(totalAmt)}</div>
+    <div class="card">
+      ${list.length ? list.map(x => isSales ? `
+        <div class="row"><div><div class="name">${esc(x.item)} × ${x.qty}<span class="badge ${x.pay}">${PAY[x.pay]}${x.pay === 'credit' && x.paid ? ' · paid' : ''}</span></div>
+          <div class="sub">${fmtTime(x.ts)}${x.customer ? ' · ' + esc(x.customer) : ''}</div></div>
+          <div style="display:flex;align-items:center"><span class="amt">${money(lineTotal(x))}</span><button class="x" aria-label="Delete sale" data-action="delSale" data-id="${x.id}">×</button></div></div>` : `
+        <div class="row"><div><div class="name">${esc(x.note)}</div><div class="sub">${fmtTime(x.ts)}</div></div>
+          <div style="display:flex;align-items:center"><span class="amt exp">${money(x.amount)}</span><button class="x" aria-label="Delete expense" data-action="delExp" data-id="${x.id}">×</button></div></div>`).join('')
+        : '<div class="empty">Nothing here for this period.</div>'}
+    </div>`;
+}
+
+function render() {
+  const views = { home: homeView, sell: sellView, owed: owedView, records: recordsView };
+  const owedCount = new Set(state.sales.filter(s => !s.paid).map(s => s.customer || 'No name')).size;
+  const cur = ['GH₵', '₦', 'KSh', 'R', '$', '£', '€'];
+  const tab = (id, label, extra = '') => `<button class="${ui.tab === id ? 'on' : ''}" data-action="tab" data-tab="${id}">${label}${extra}</button>`;
+  $('#app').innerHTML = `
+    <header class="top"><h1>Sales Book</h1>
+      <select id="currency" aria-label="Currency">${cur.map(c => `<option ${c === state.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></header>
+    <main>${views[ui.tab]()}</main>
+    <nav><div>${tab('home', 'Home')}${tab('sell', 'Sell')}${tab('owed', 'Owed', owedCount ? `<span class="n">${owedCount}</span>` : '')}${tab('records', 'Records')}</div></nav>
+    <div class="toast ${ui.toast ? '' : ''}" role="status" aria-live="polite"></div>`;
+}
+
+// ---------- actions ----------
+function submitSale() {
+  const f = ui.form, item = f.item.trim(), qty = Number(f.qty), price = Number(f.price);
+  if (!item) return fail('Enter the item you sold.');
+  if (!(qty > 0)) return fail('Quantity must be more than 0.');
+  if (!(price > 0)) return fail('Enter the price for one item.');
+  if (f.pay === 'credit' && !f.customer.trim()) return fail('Enter who owes you for this credit sale.');
+  state.sales.push({ id: uid(), ts: Date.now(), item, qty, price, pay: f.pay,
+    customer: f.customer.trim(), paid: f.pay !== 'credit' });
+  const p = state.products.find(p => p.name.toLowerCase() === item.toLowerCase());
+  if (p) p.price = price; else state.products.push({ id: uid(), name: item, price });
+  ui.form = { item: '', qty: 1, price: '', pay: f.pay, customer: '' };
+  ui.err = '';
+  save(); render(); toast('Sale recorded · ' + money(qty * price));
+}
+function fail(msg) { ui.err = msg; render(); }
+
+function addExpense() {
+  const note = ui.exp.note.trim(), amount = Number(ui.exp.amount);
+  if (!note) return fail('Enter what the money was spent on.');
+  if (!(amount > 0)) return fail('Enter an amount more than 0.');
+  state.expenses.push({ id: uid(), ts: Date.now(), note, amount });
+  ui.exp = { note: '', amount: '' }; ui.err = '';
+  save(); render(); toast('Expense added');
+}
+
+function loadSample() {
+  const items = [['Bottled water', 3], ['Bread loaf', 8], ['Eggs (tray)', 45], ['Phone credit', 10]];
+  const names = ['Ama', 'Kojo', 'Esi'];
+  state.products = items.map(([name, price]) => ({ id: uid(), name, price }));
+  state.sales = []; state.expenses = [];
+  for (let d = 6; d >= 0; d--) {
+    for (let k = 0; k < 4 + Math.floor(Math.random() * 4); k++) {
+      const [item, price] = items[Math.floor(Math.random() * items.length)];
+      const credit = Math.random() < 0.15, dt = new Date();
+      dt.setDate(dt.getDate() - d); dt.setHours(8 + k * 2, Math.floor(Math.random() * 59));
+      if (dt.getTime() > Date.now()) dt.setTime(Date.now() - k * 60000);
+      state.sales.push({ id: uid(), ts: dt.getTime(), item, qty: 1 + Math.floor(Math.random() * 4), price,
+        pay: credit ? 'credit' : Math.random() < .4 ? 'momo' : 'cash',
+        customer: credit ? names[Math.floor(Math.random() * 3)] : '', paid: !credit });
+    }
+  }
+  state.expenses.push({ id: uid(), ts: Date.now() - 3600000, note: 'Transport', amount: 20 });
+  save(); render(); toast('Sample data added');
+}
+
+// ---------- events ----------
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-action]'); if (!b) return;
+  const a = b.dataset.action, id = b.dataset.id;
+  if (a === 'tab') { ui.tab = b.dataset.tab; ui.err = ''; }
+  else if (a === 'chip') { const p = state.products.find(p => p.id === id); ui.form.item = p.name; ui.form.price = p.price; }
+  else if (a === 'pay') ui.form.pay = b.dataset.pay;
+  else if (a === 'kind') { ui.kind = b.dataset.v; ui.err = ''; }
+  else if (a === 'range') ui.range = b.dataset.v;
+  else if (a === 'submitSale') return submitSale();
+  else if (a === 'addExpense') return addExpense();
+  else if (a === 'sample') return loadSample();
+  else if (a === 'delSale') { state.sales = state.sales.filter(s => s.id !== id); save(); render(); return toast('Sale deleted'); }
+  else if (a === 'delExp') { state.expenses = state.expenses.filter(x => x.id !== id); save(); render(); return toast('Expense deleted'); }
+  else if (a === 'paid') { const s = state.sales.find(s => s.id === id); s.paid = true; save(); render(); return toast('Marked paid · ' + money(lineTotal(s))); }
+  else if (a === 'paidAll') { state.sales.forEach(s => { if (!s.paid && (s.customer || 'No name') === b.dataset.name) s.paid = true; }); save(); render(); return toast('All marked paid'); }
+  render();
+});
+
+document.addEventListener('input', e => {
+  const f = e.target.dataset.field; if (!f) return;
+  const v = e.target.value;
+  if (f === 'expNote') return void (ui.exp.note = v);
+  if (f === 'expAmt') return void (ui.exp.amount = v);
+  ui.form[f] = v;
+  if (f === 'item') {
+    const p = state.products.find(p => p.name.toLowerCase() === v.trim().toLowerCase());
+    if (p && !ui.form.price) { ui.form.price = p.price; $('#price').value = p.price; }
+  }
+  const t = $('#liveTotal');
+  if (t) t.textContent = money((Number(ui.form.qty) || 0) * (Number(ui.form.price) || 0));
+});
+
+document.addEventListener('change', e => {
+  if (e.target.id === 'currency') { state.currency = e.target.value; save(); render(); }
+});
+
+load().then(render);
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
